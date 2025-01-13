@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# Определяем путь к рабочему столу
+DESKTOP=$(xdg-user-dir DESKTOP)
+
+# Имя ярлыка
+SHORTCUT_NAME="Chrome_Custom.desktop"
+
+# Путь к папке для данных пользователя
+USER_DATA_DIR="/home/$(whoami)/MyChromeData"
+
+# Создаем папку, если её нет
+mkdir -p "$USER_DATA_DIR"
+
+# Ищем путь к исполняемому файлу Google Chrome
+CHROME_PATH=$(which google-chrome-stable)
+
+# Проверяем, найден ли путь к Chrome
+if [ -z "$CHROME_PATH" ]; then
+    echo "Google Chrome не найден. Убедитесь, что он установлен."
+    exit 1
+fi
+
+# Создаем содержимое для ярлыка
+DESKTOP_ENTRY="[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Chrome Custom
+Exec=$CHROME_PATH %U --user-data-dir=$USER_DATA_DIR
+Icon=google-chrome
+Terminal=false
+Categories=Network;WebBrowser;"
+
+# Записываем содержимое в файл ярлыка
+echo "$DESKTOP_ENTRY" > "$DESKTOP/$SHORTCUT_NAME"
+
+# Делаем ярлык исполняемым
+chmod +x "$DESKTOP/$SHORTCUT_NAME"
+
+echo "Ярлык создан: $DESKTOP/$SHORTCUT_NAME"
+echo "Данные браузера будут храниться в: $USER_DATA_DIR"
+
+# Удаляем загруженный файл скрипта
+SCRIPT_NAME=$(basename "$0")
+rm -f "$SCRIPT_NAME"
+echo "Файл скрипта $SCRIPT_NAME удалён."
